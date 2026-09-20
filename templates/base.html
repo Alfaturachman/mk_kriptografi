@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Proteksi Citra Medis{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <a class="brand" href="{{ url_for('index') }}">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            <path d="M12 8v6M9 11h6"></path>
+          </svg>
+        </span>
+        <span class="brand-text">
+          <strong>CitraMedis</strong>
+          <small>Enkripsi &amp; Watermarking</small>
+        </span>
+      </a>
+      <nav class="nav">
+        <a href="{{ url_for('index') }}" class="{{ 'active' if request.endpoint == 'index' }}">Beranda</a>
+        <a href="{{ url_for('algoritma') }}" class="{{ 'active' if request.endpoint == 'algoritma' }}">Algoritma</a>
+        <a href="{{ url_for('pengujian') }}" class="{{ 'active' if request.endpoint == 'pengujian' }}">Pengujian</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>Proyek Kriptografi &mdash; proteksi ganda citra medis: enkripsi AES + fragile watermarking.</p>
+    </div>
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

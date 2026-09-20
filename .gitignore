@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+
+# Test & cache
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Runtime artifacts
+tmp/
+*.log
+
+# OS / editor
+Thumbs.db
+.DS_Store
+.vscode/
+.idea/
+
+# Secret / local
+.env

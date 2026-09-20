@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}Algoritma — Proteksi Citra Medis{% endblock %}
+{% block content %}
+
+<section class="hero hero-compact">
+  <h1>Algoritma &amp; metode</h1>
+  <p>
+    Empat metode inti bekerja sebagai satu kesatuan: gembok (AES), stempel pembeda
+    (LSB watermarking), tanda tangan (SHA-256), dan sekuriti pamungkas yang mendeteksi
+    manipulasi (tamper detection per blok).
+  </p>
+</section>
+
+<div class="method-list">
+
+  <article class="card method">
+    <div class="card-head">
+      <span class="card-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+      </span>
+      <div>
+        <h2>AES-256-CBC</h2>
+        <p>Kerahasiaan: seluruh byte berkas dienkripsi dengan kunci turunan PBKDF2.</p>
+      </div>
+    </div>
+    <ul class="steps">
+      <li>Kunci di-derive dari password melalui PBKDF2-HMAC-SHA256 (200.000 iterasi) + salt acak 16 byte.</li>
+      <li>IV acak 16 byte per enkripsi memastikan hasil berbeda tiap proses walau isi sama.</li>
+      <li>Ciphertext disimpan dengan format <code>AES1 | salt | iv | data</code>.</li>
+    </ul>
+    <pre><code>key = PBKDF2(password, salt, len=32)
+enc = AES_CBC_encrypt(pad(plaintext), key, iv)
+file = "AES1" + salt + iv + enc</code></pre>
+  </article>
+
+  <article class="card method">
+    <div class="card-head">
+      <span class="card-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+      </span>
+      <div>
+        <h2>LSB Watermarking</h2>
+        <p>Penyisipan stempel pada bit paling tidak signifikan bernilai tak terlihat.</p>
+      </div>
+    </div>
+    <ul class="steps">
+      <li>Setiap blok 8x8 membawa 16 bit hash 7-bit-tertinggi miliknya sendiri pada LSB kanal merah.</li>
+      <li>Grayscale (DICOM) menempatkan metadata di 8 baris terbawah agar tak bertabrakan dengan stempel blok.</li>
+      <li>Perubahan maksimal 1 dari 65535 pada citra 16-bit, atau 1 dari 255 pada 8-bit: tak mengganggu diagnosis.</li>
+    </ul>
+    <pre><code>lsb = pixels & ~1        # bersihkan bit terakhir
+pixels = lsb | bit       # sisipkan 1 bit data</code></pre>
+  </article>
+
+  <article class="card method">
+    <div class="card-head">
+      <span class="card-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V4h16v3"></path><rect x="4" y="7" width="16" height="13"></rect><path d="M8 11h8M8 15h5"></path></svg>
+      </span>
+      <div>
+        <h2>SHA-256 Signature</h2>
+        <p>Tanda tangan integritas metadata pasien disisipkan ke LSB.</p>
+      </div>
+    </div>
+    <ul class="steps">
+      <li>Metadata (PatientID, PatientName, StudyDate, Modality, UID, dll.) digabung jadi string tunggal.</li>
+      <li>Hash SHA-256 (32 byte) dari string itu disisipkan ke area metadata citra.</li>
+      <li>Saat verifikasi, hash dihitung ulang dari metadata saat ini lalu dibandingkan.</li>
+    </ul>
+    <pre><code>digest = SHA256(metadata)   # 32 byte
+embed_lsb(image, digest)
+...</code></pre>
+  </article>
+
+  <article class="card method">
+    <div class="card-head">
+      <span class="card-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="M9 12l2 2 4-4"></path></svg>
+      </span>
+      <div>
+        <h2>Tamper Detection &amp; Lokalisasi</h2>
+        <p>Verifikasi bebas referensi: tak perlu citra asli untuk menemukan area yang diubah.</p>
+      </div>
+    </div>
+    <ul class="steps">
+      <li>Hitung ulang hash tiap blok dari 7 bit tertinggi piksel yang ada sekarang.</li>
+      <li>Bandingkan dengan hash yang terekstrak dari LSB blok.</li>
+      <li>Blok yang tidak cocok ditandai penuh 8x8 &mdash; piksel yang dimanipulasi terlokalisasi presisi.</li>
+    </ul>
+    <pre><code>current = hash7(pixels)          # konten saat ini
+stored  = read_lsb(pixels)        # stempel blok
+mask    = i where current[i] != stored[i]</code></pre>
+  </article>
+
+</div>
+
+{% endblock %}

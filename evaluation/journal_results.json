@@ -1,0 +1,463 @@
+{
+  "quality": [
+    {
+      "slice": "IM-0001-0001.dcm",
+      "psnr_wm": 88.94,
+      "ssim_wm": 0.999997,
+      "psnr_rec": 117.15958409454714,
+      "ssim_rec": 1.0,
+      "ber": 0.0,
+      "exact": true,
+      "cap_bits": 10144,
+      "cap_est_bits": 52944,
+      "runtime_s": 0.288
+    },
+    {
+      "slice": "IM-0001-0002.dcm",
+      "psnr_wm": 88.91,
+      "ssim_wm": 0.999997,
+      "psnr_rec": 117.08288550388187,
+      "ssim_rec": 1.0,
+      "ber": 0.0,
+      "exact": true,
+      "cap_bits": 10144,
+      "cap_est_bits": 53904,
+      "runtime_s": 0.249
+    },
+    {
+      "slice": "IM-0001-0003.dcm",
+      "psnr_wm": 89.08,
+      "ssim_wm": 0.999997,
+      "psnr_rec": 117.21801024234966,
+      "ssim_rec": 1.0,
+      "ber": 0.0,
+      "exact": true,
+      "cap_bits": 10144,
+      "cap_est_bits": 49568,
+      "runtime_s": 0.23
+    },
+    {
+      "slice": "IM-0001-0004.dcm",
+      "psnr_wm": 87.83,
+      "ssim_wm": 0.999997,
+      "psnr_rec": 116.67789505247838,
+      "ssim_rec": 1.0,
+      "ber": 0.0,
+      "exact": true,
+      "cap_bits": 10144,
+      "cap_est_bits": 46928,
+      "runtime_s": 0.252
+    },
+    {
+      "slice": "IM-0001-0005.dcm",
+      "psnr_wm": 86.8,
+      "ssim_wm": 0.999996,
+      "psnr_rec": 116.08285213798509,
+      "ssim_rec": 1.0,
+      "ber": 0.0,
+      "exact": true,
+      "cap_bits": 10144,
+      "cap_est_bits": 44384,
+      "runtime_s": 0.258
+    },
+    {
+      "slice": "IM-0001-0006.dcm",
+      "psnr_wm": 85.93,
+      "ssim_wm": 0.999995,
+      "psnr_rec": 115.65431025166062,
+      "ssim_rec": 1.0,
+      "ber": 0.0,
+      "exact": true,
+      "cap_bits": 10144,
+      "cap_est_bits": 39552,
+      "runtime_s": 0.284
+    },
+    {
+      "slice": "IM-0001-0007.dcm",
+      "psnr_wm": 85.06,
+      "ssim_wm": 0.999994,
+      "psnr_rec": 115.32514178965612,
+      "ssim_rec": 1.0,
+      "ber": 0.0,
+      "exact": true,
+      "cap_bits": 10144,
+      "cap_est_bits": 36688,
+      "runtime_s": 0.299
+    },
+    {
+      "slice": "IM-0001-0008.dcm",
+      "psnr_wm": 85.09,
+      "ssim_wm": 0.999994,
+      "psnr_rec": 115.21249425438214,
+      "ssim_rec": 1.0,
+      "ber": 0.0,
+      "exact": true,
+      "cap_bits": 10144,
+      "cap_est_bits": 36336,
+      "runtime_s": 0.305
+    },
+    {
+      "slice": "IM-0001-0009.dcm",
+      "psnr_wm": 84.5,
+      "ssim_wm": 0.999993,
+      "psnr_rec": 114.81338175429208,
+      "ssim_rec": 1.0,
+      "ber": 0.0,
+      "exact": true,
+      "cap_bits": 10144,
+      "cap_est_bits": 32608,
+      "runtime_s": 0.344
+    },
+    {
+      "slice": "IM-0001-0010.dcm",
+      "psnr_wm": 84.49,
+      "ssim_wm": 0.999993,
+      "psnr_rec": 114.83220685883927,
+      "ssim_rec": 1.0,
+      "ber": 0.0,
+      "exact": true,
+      "cap_bits": 10144,
+      "cap_est_bits": 30112,
+      "runtime_s": 0.321
+    },
+    {
+      "slice": "IM-0001-0011.dcm",
+      "psnr_wm": 84.39,
+      "ssim_wm": 0.999993,
+      "psnr_rec": 114.87962974562556,
+      "ssim_rec": 1.0,
+      "ber": 0.0,
+      "exact": true,
+      "cap_bits": 10144,
+      "cap_est_bits": 30928,
+      "runtime_s": 0.311
+    },
+    {
+      "slice": "IM-0001-0012.dcm",
+      "psnr_wm": 84.42,
+      "ssim_wm": 0.999993,
+      "psnr_rec": 114.84354121451764,
+      "ssim_rec": 1.0,
+      "ber": 0.0,
+      "exact": true,
+      "cap_bits": 10144,
+      "cap_est_bits": 32112,
+      "runtime_s": 0.308
+    },
+    {
+      "slice": "IM-0001-0013.dcm",
+      "psnr_wm": 83.72,
+      "ssim_wm": 0.999992,
+      "psnr_rec": 114.57402538204263,
+      "ssim_rec": 1.0,
+      "ber": 0.0,
+      "exact": true,
+      "cap_bits": 10144,
+      "cap_est_bits": 29024,
+      "runtime_s": 0.339
+    },
+    {
+      "slice": "IM-0001-0014.dcm",
+      "psnr_wm": 84.31,
+      "ssim_wm": 0.999992,
+      "psnr_rec": 114.88344604184569,
+      "ssim_rec": 1.0,
+      "ber": 0.0,
+      "exact": true,
+      "cap_bits": 10144,
+      "cap_est_bits": 30000,
+      "runtime_s": 0.306
+    },
+    {
+      "slice": "IM-0001-0015.dcm",
+      "psnr_wm": 84.33,
+      "ssim_wm": 0.999993,
+      "psnr_rec": 115.0389148059956,
+      "ssim_rec": 1.0,
+      "ber": 0.0,
+      "exact": true,
+      "cap_bits": 10144,
+      "cap_est_bits": 32192,
+      "runtime_s": 0.341
+    },
+    {
+      "slice": "IM-0001-0016.dcm",
+      "psnr_wm": 85.15,
+      "ssim_wm": 0.999994,
+      "psnr_rec": 115.26845280003181,
+      "ssim_rec": 1.0,
+      "ber": 0.0,
+      "exact": true,
+      "cap_bits": 10144,
+      "cap_est_bits": 31760,
+      "runtime_s": 0.288
+    },
+    {
+      "slice": "IM-0001-0017.dcm",
+      "psnr_wm": 85.15,
+      "ssim_wm": 0.999994,
+      "psnr_rec": 115.3272556591644,
+      "ssim_rec": 1.0,
+      "ber": 0.0,
+      "exact": true,
+      "cap_bits": 10144,
+      "cap_est_bits": 31648,
+      "runtime_s": 0.293
+    },
+    {
+      "slice": "IM-0001-0018.dcm",
+      "psnr_wm": 84.96,
+      "ssim_wm": 0.999993,
+      "psnr_rec": 115.25803556112245,
+      "ssim_rec": 1.0,
+      "ber": 0.0,
+      "exact": true,
+      "cap_bits": 10144,
+      "cap_est_bits": 28384,
+      "runtime_s": 0.287
+    },
+    {
+      "slice": "IM-0001-0019.dcm",
+      "psnr_wm": 85.86,
+      "ssim_wm": 0.999995,
+      "psnr_rec": 115.54179243445815,
+      "ssim_rec": 1.0,
+      "ber": 0.0,
+      "exact": true,
+      "cap_bits": 10144,
+      "cap_est_bits": 32304,
+      "runtime_s": 0.267
+    },
+    {
+      "slice": "IM-0001-0020.dcm",
+      "psnr_wm": 87.95,
+      "ssim_wm": 0.999997,
+      "psnr_rec": 116.56116515595393,
+      "ssim_rec": 1.0,
+      "ber": 0.0,
+      "exact": true,
+      "cap_bits": 10144,
+      "cap_est_bits": 37984,
+      "runtime_s": 0.239
+    },
+    {
+      "slice": "IM-0001-0021.dcm",
+      "psnr_wm": 88.02,
+      "ssim_wm": 0.999997,
+      "psnr_rec": 116.5752336645928,
+      "ssim_rec": 1.0,
+      "ber": 0.0,
+      "exact": true,
+      "cap_bits": 10144,
+      "cap_est_bits": 39792,
+      "runtime_s": 0.235
+    },
+    {
+      "slice": "IM-0001-0022.dcm",
+      "psnr_wm": 88.05,
+      "ssim_wm": 0.999997,
+      "psnr_rec": 116.61771471558838,
+      "ssim_rec": 1.0,
+      "ber": 0.0,
+      "exact": true,
+      "cap_bits": 10144,
+      "cap_est_bits": 37984,
+      "runtime_s": 0.23
+    },
+    {
+      "slice": "IM-0001-0023.dcm",
+      "psnr_wm": 89.04,
+      "ssim_wm": 0.999997,
+      "psnr_rec": 117.23438020074019,
+      "ssim_rec": 1.0,
+      "ber": 0.0,
+      "exact": true,
+      "cap_bits": 10144,
+      "cap_est_bits": 41440,
+      "runtime_s": 0.215
+    },
+    {
+      "slice": "IM-0001-0024.dcm",
+      "psnr_wm": 90.37,
+      "ssim_wm": 0.999998,
+      "psnr_rec": 117.71607654831577,
+      "ssim_rec": 1.0,
+      "ber": 0.0,
+      "exact": true,
+      "cap_bits": 10144,
+      "cap_est_bits": 41056,
+      "runtime_s": 0.197
+    }
+  ],
+  "quality_agg": {
+    "n_slices": 24,
+    "ok_exact": 24,
+    "psnr_wm": {
+      "min": 83.72,
+      "max": 90.37,
+      "mean": 86.35
+    },
+    "ssim_wm": {
+      "min": 0.999992,
+      "max": 0.999998,
+      "mean": 0.999995
+    },
+    "ssim_rec": {
+      "min": 1.0,
+      "max": 1.0,
+      "mean": 1.0
+    },
+    "cap_bits": {
+      "min": 10144,
+      "max": 10144,
+      "mean": 10144.0
+    },
+    "runtime_s": {
+      "min": 0.197,
+      "max": 0.344,
+      "mean": 0.279
+    }
+  },
+  "tamper_agg": {
+    "1px|plain": {
+      "n": 8,
+      "detected": 8,
+      "localized": 8,
+      "localization_available_rate": 1.0,
+      "metrics": {
+        "total_blocks": 616.0,
+        "gt_blocks": 1.0,
+        "tp": 1.0,
+        "tn": 607.75,
+        "fp": 7.25,
+        "fn": 0.0,
+        "precision": 0.8771,
+        "recall": 1.0,
+        "f1": 0.8792,
+        "accuracy": 0.9882,
+        "fpr": 0.0118,
+        "localization_iou": 0.8771
+      }
+    },
+    "1px|aes": {
+      "n": 8,
+      "detected": 8,
+      "localized": 7,
+      "localization_available_rate": 0.875,
+      "metrics": {
+        "total_blocks": 616.0,
+        "gt_blocks": 1.0,
+        "tp": 1.0,
+        "tn": 615.0,
+        "fp": 0.0,
+        "fn": 0.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "accuracy": 1.0,
+        "fpr": 0.0,
+        "localization_iou": 1.0
+      }
+    },
+    "8x8|plain": {
+      "n": 8,
+      "detected": 8,
+      "localized": 8,
+      "localization_available_rate": 1.0,
+      "metrics": {
+        "total_blocks": 616.0,
+        "gt_blocks": 1.0,
+        "tp": 1.0,
+        "tn": 360.75,
+        "fp": 254.25,
+        "fn": 0.0,
+        "precision": 0.1322,
+        "recall": 1.0,
+        "f1": 0.139,
+        "accuracy": 0.5873,
+        "fpr": 0.4134,
+        "localization_iou": 0.1322
+      }
+    },
+    "8x8|aes": {
+      "n": 8,
+      "detected": 8,
+      "localized": 3,
+      "localization_available_rate": 0.375,
+      "metrics": {
+        "total_blocks": 616.0,
+        "gt_blocks": 1.0,
+        "tp": 1.0,
+        "tn": 539.3333,
+        "fp": 75.6667,
+        "fn": 0.0,
+        "precision": 0.3423,
+        "recall": 1.0,
+        "f1": 0.3509,
+        "accuracy": 0.8772,
+        "fpr": 0.123,
+        "localization_iou": 0.3423
+      }
+    },
+    "16x16|plain": {
+      "n": 8,
+      "detected": 8,
+      "localized": 7,
+      "localization_available_rate": 0.875,
+      "metrics": {
+        "total_blocks": 616.0,
+        "gt_blocks": 1.0,
+        "tp": 1.0,
+        "tn": 286.0,
+        "fp": 329.0,
+        "fn": 0.0,
+        "precision": 0.0034,
+        "recall": 1.0,
+        "f1": 0.0067,
+        "accuracy": 0.4659,
+        "fpr": 0.535,
+        "localization_iou": 0.0034
+      }
+    },
+    "16x16|aes": {
+      "n": 8,
+      "detected": 8,
+      "localized": 0,
+      "localization_available_rate": 0.0,
+      "metrics": null
+    },
+    "48x48|plain": {
+      "n": 8,
+      "detected": 8,
+      "localized": 8,
+      "localization_available_rate": 1.0,
+      "metrics": {
+        "total_blocks": 616.0,
+        "gt_blocks": 9.0,
+        "tp": 9.0,
+        "tn": 114.375,
+        "fp": 492.625,
+        "fn": 0.0,
+        "precision": 0.0181,
+        "recall": 1.0,
+        "f1": 0.0355,
+        "accuracy": 0.2003,
+        "fpr": 0.8116,
+        "localization_iou": 0.0181
+      }
+    },
+    "48x48|aes": {
+      "n": 8,
+      "detected": 8,
+      "localized": 0,
+      "localization_available_rate": 0.0,
+      "metrics": null
+    }
+  },
+  "meta": {
+    "dataset": "D:\\A11.2025.16609\\SEMESTER 3\\KRIPTOGRAFI\\project_medical_dicom_watermark\\dataset\\BrainTumorMRI",
+    "n_slices": 24,
+    "passphrase": "jurnal-eval-2026",
+    "runtime_total_s": 24.8
+  }
+}

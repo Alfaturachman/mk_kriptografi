@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+{% block title %}Beranda — Proteksi Citra Medis{% endblock %}
+{% block content %}
+
+<section class="hero">
+  <h1>Proteksi ganda citra medis</h1>
+  <p>
+    Gabungan enkripsi AES-256 dan <em>fragile watermarking</em> LSB: citra aman saat
+    disimpan dan dikirim, dan setiap manipulasi piksel atau metadata pasien dapat
+    dideteksi sekaligus dilokalisasi.
+  </p>
+</section>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% for category, message in messages %}
+{% if category == 'error' %}
+<div class="alert alert-error" role="alert" {% if loop.first %}id="tb-alert"{% endif %}>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+  <div class="alert-body">
+    <strong>Proses belum berhasil</strong>
+    <span>{{ message }}</span>
+  </div>
+  <button class="alert-close" type="button" aria-label="Tutup">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+  </button>
+</div>
+{% endif %}
+{% endfor %}
+{% endwith %}
+
+<div class="grid-2">
+  <form class="card" method="post" enctype="multipart/form-data">
+    <input type="hidden" name="action" value="protek">
+    <div class="card-head">
+      <span class="card-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"></path><path d="M12 12v9"></path><path d="M8 17l4 4 4-4"></path></svg>
+      </span>
+      <div>
+        <h2>Proteksi &amp; Enkripsi</h2>
+        <p>Tanamkan watermark, lalu kunci file dengan AES-256.</p>
+      </div>
+    </div>
+
+    <label class="filezone">
+      <input type="file" name="file" accept=".png,.jpg,.jpeg,.bmp,.dcm" required>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+      <span class="filezone-hint">Pilih citra (PNG/JPG/BMP) atau DICOM (.dcm)</span>
+      <span class="filezone-name"></span>
+    </label>
+
+    <div class="field">
+      <label for="pw-prot">Kunci</label>
+      <input class="text" type="password" id="pw-prot" name="password" placeholder="Kunci enkripsi" required autocomplete="off">
+    </div>
+
+    <div class="field">
+      <label for="md-prot">Metadata pasien <em>(opsional, teks)</em></label>
+      <input class="text" type="text" id="md-prot" name="metadata" placeholder="Misal: PATIENT:AE-0001;STUDY:CHEST-XRAY" autocomplete="off">
+      <small>Kosongkan untuk DICOM dikumpulkan dari tag file; untuk gambar dipakai default nama file.</small>
+    </div>
+
+    <button class="btn btn-primary" type="submit">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+      Proteksi &amp; Enkripsi
+    </button>
+  </form>
+
+  <form class="card" method="post" enctype="multipart/form-data">
+    <input type="hidden" name="action" value="verif">
+    <div class="card-head">
+      <span class="card-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path></svg>
+      </span>
+      <div>
+        <h2>Dekripsi &amp; Verifikasi</h2>
+        <p>Buka gembok, periksa integritas piksel dan metadata.</p>
+      </div>
+    </div>
+
+    <label class="filezone">
+      <input type="file" name="file" accept=".krip" required>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+      <span class="filezone-hint">Pilih berkas .krip hasil enkripsi</span>
+      <span class="filezone-name"></span>
+    </label>
+
+    <div class="field">
+      <label for="pw-ver">Kunci</label>
+      <input class="text" type="password" id="pw-ver" name="password" placeholder="Kunci yang sama" required autocomplete="off">
+    </div>
+
+    <div class="field">
+      <label for="md-ver">Metadata verifikasi <em>(gambar saja)</em></label>
+      <input class="text" type="text" id="md-ver" name="metadata" placeholder="Salin metadata yang dipakai saat proteksi" autocomplete="off">
+      <small>Untuk DICOM metadata diambil otomatis dari tag, boleh dikosongkan.</small>
+    </div>
+
+    <button class="btn btn-primary" type="submit">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+      Dekripsi &amp; Verifikasi
+    </button>
+  </form>
+</div>
+
+{% if result %}
+<section class="card result-card">
+  <div class="card-head">
+    <span class="card-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+    </span>
+    <div>
+      <h2>
+        {% if result.mode == 'protek' %}Hasil proteksi &amp; enkripsi{% else %}Hasil verifikasi{% endif %}
+        <span class="badge badge-neutral">{{ result.kind }}</span>
+      </h2>
+      <p>Waktu proses: {{ result.waktu_ms }} ms</p>
+    </div>
+  </div>
+
+  {% if result.mode == 'protek' %}
+  <div class="figure-grid">
+    <figure>
+      <img src="{{ result.preview_orig }}" alt="Citra asli">
+      <figcaption>Citra asli</figcaption>
+    </figure>
+    <figure>
+      <img src="{{ result.preview_wm }}" alt="Citra ber-watermark">
+      <figcaption>Ber-watermark + enkripsi (AES-256-CBC){% if result.reversible %} &mdash; reversible (PEE-HS){% endif %}</figcaption>
+    </figure>
+  </div>
+  <div class="metrics">
+    <div class="metric" title="Peak Signal-to-Noise Ratio">
+      <span class="metric-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg></span>
+      <div><small>PSNR</small><strong>{{ result.psnr }} dB</strong></div>
+    </div>
+    <div class="metric">
+      <span class="metric-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"></path><line x1="4" y1="10" x2="20" y2="10"></line><line x1="10" y1="4" x2="10" y2="20"></line></svg></span>
+      <div><small>Ukuran asli</small><strong>{{ (result.size_src / 1024)|round(1) }} KB</strong></div>
+    </div>
+    <div class="metric">
+      <span class="metric-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></span>
+      <div><small>Ukuran terenkripsi</small><strong>{{ (result.size_enc / 1024)|round(1) }} KB</strong></div>
+    </div>
+  </div>
+  <div class="meta-line">
+    <small>Metadata yang ditandatangani:</small>
+    <code>{{ result.metadata_used }}</code>
+  </div>
+  <div class="actions">
+    <a class="btn btn-primary" href="{{ result.download_uri }}" download="{{ result.download_name }}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+      Unduh {{ result.download_name }}
+    </a>
+  </div>
+
+  {% else %}
+  <div class="figure-grid">
+    <figure>
+      <img src="{{ result.preview_rec }}" alt="Hasil dekripsi">
+      <figcaption>{% if result.reversible %}Citra hasil recovery (lossless){% else %}Citra hasil dekripsi{% endif %}</figcaption>
+    </figure>
+    <figure>
+      <img src="{{ result.preview_ovl }}" alt="Citra dengan peta manipulasi">
+      <figcaption>Peta lokasi manipulasi</figcaption>
+    </figure>
+  </div>
+  <div class="verdict">
+    {% if result.pixel_tamper %}
+    <div class="pill pill-danger">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+      Manipulasi piksel terdeteksi &mdash; {{ result.mask_px }} piksel ditandai
+    </div>
+    {% else %}
+    <div class="pill pill-ok">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+      Piksel utuh, tidak ada manipulasi
+    </div>
+    {% endif %}
+    {% if result.metadata_ok %}
+    <div class="pill pill-ok">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+      Metadata valid
+    </div>
+    {% else %}
+    <div class="pill pill-danger">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+      Metadata tidak valid / diubah
+    </div>
+    {% endif %}
+  </div>
+  {% if result.error_pesan %}
+  <div class="pill pill-danger">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+      Payload reversible tidak dapat dipercaya: {{ result.error_pesan }}
+  </div>
+  {% endif %}
+  <div class="meta-line">
+    <small>Metadata yang diperiksa:</small>
+    <code>{{ result.metadata_used }}</code>
+  </div>
+  <div class="actions">
+    <a class="btn btn-primary" href="{{ result.recovered_uri }}" download="{{ result.recovered_name }}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+      Unduh {{ result.recovered_name }}
+    </a>
+  </div>
+  {% endif %}
+</section>
+{% endif %}
+
+{% endblock %}
