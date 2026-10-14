@@ -134,14 +134,14 @@ Dokumen ini merangkum analisis literatur dari beberapa jurnal terkait *medical i
 
 ## 3. Paper: Reversible Watermarking for Medical Images Using ROI-based Tamper Localization and Recovery
 
-- **Penulis:** Aulia Arham , Teguh Bharata Adji , Syukron Abu Ishaq Alfarozi , Hanung Adi Nugroho
+- **Penulis:** Aulia Arham, Teguh Bharata Adji, Syukron Abu Ishaq Alfarozi, Hanung Adi Nugroho (2023)
 
 ### Ringkasan Analisis
 
 | Aspek | Hasil Analisis |
 |---|---|
-| **Medical Modality** | Citra medis MRI Brain, MRI Breast, dan CT Lung. |
-| **DICOM Standard** | Yes. Penelitian menggunakan citra medis dalam format DICOM dan mempertahankan kompatibilitas dengan standar DICOM. Informasi metadata pasien dan atribut DICOM juga dimanfaatkan sebagai bagian dari watermark. |
+| **Medical Modality** | Citra medis MRI, Ultrasound (US), dan X-ray (total 30 citra medis: 10 MRI, 10 US, 10 X-ray). |
+| **DICOM Standard** | Non-eksplisit DICOM (Format citra medis 8-bit grayscale [0, 255]). Algoritma diuji pada matriks piksel 8-bit, bukan file kontainer native DICOM 16-bit. |
 | **AES Encryption** | No. Penelitian tidak menggunakan algoritma AES untuk enkripsi. Keamanan data lebih difokuskan pada mekanisme watermarking reversibel, autentikasi, dan deteksi manipulasi menggunakan informasi hash serta data recovery yang disisipkan ke dalam citra. |
 | **Watermark Type** | Informasi pasien (Electronic Patient Record/EPR), metadata DICOM, recovery watermark, dan authentication watermark. |
 | **Watermark Nature** | Fragile Watermark. Watermark dirancang untuk mendeteksi modifikasi pada citra medis dan menjaga integritas data diagnostik. |
@@ -237,10 +237,10 @@ Dokumen ini merangkum analisis literatur dari beberapa jurnal terkait *medical i
 
 ## 5. Perbandingan Antar Paper
 
-| Aspek | Paper 1 (Mosco-Garcia 2025) | Paper 2 (Qasim & Ali 2026) | Paper 3 (ROI-based) | Paper 4 (Rupa Ch 2024) |
+| Aspek | Paper 1 (Mosco-Garcia 2025) | Paper 2 (Qasim & Ali 2026) | Paper 3 (Arham et al. 2023) | Paper 4 (Rupa Ch 2024) |
 |---|---|---|---|---|
-| **Medical Modality** | CT, MRI, CR | MRI Brain/Breast, CT Lung | MRI Brain/Breast, CT Lung | MRI Brain |
-| **DICOM Standard** | Yes | Yes | Yes | Tidak eksplisit |
+| **Medical Modality** | CT, MRI, CR | MRI Brain/Breast, CT Lung | MRI, US, X-ray (30 citra) | MRI Brain |
+| **Format & Kedalaman Bit** | DICOM 16-bit | DICOM 16-bit | Citra Medis 8-bit (Non-DICOM) | Citra Medis 8-bit |
 | **AES Encryption** | No (chaotic) | No (MD5) | No (hash) | No (SHA-256 + ECDSA) |
 | **Watermark Nature** | Fragile | Fragile | Fragile | Semi-Fragile |
 | **Reversible** | Yes | Yes | Yes | No |
@@ -258,7 +258,7 @@ Berdasarkan kekurangan yang dilaporkan pada keempat paper, gap yang belum terjaw
 1. **Tidak ada yang menggabungkan kriptografi modern (AES) dengan metode watermarking DICOM.** Keempat paper menghindari AES dan hanya mengandalkan chaotic encryption (P1), MD5 (P2), hash + ECDSA (P3/P4). Hash MD5 (P2) bahkan sudah tidak direkomendasikan secara kriptografis.
 2. **Fungsi keamanan belum lengkap dalam satu metode.** Paper 1 (localization, tanpa recovery penuh) vs Paper 3 (localization + recovery, tanpa kriptografi kuat); Paper 2 dan Paper 4 tanpa localization maupun recovery.
 3. **Robustness rendah pada pendekatan fragile.** P1, P2, P3 sangat sensitif terhadap kompresi JPEG, noise, dan filter, sehingga kurang cocok untuk transmisi telemedicine.
-4. **Evaluasi dataset terbatas / single-modality.** P4 hanya MRI Brain; P2 dan P3 berjumlah kecil (12 citra); P1 tidak merinci jumlah dataset.
+4. **Evaluasi dataset terbatas / single-modality.** P4 hanya MRI Brain (8-bit); P2 berjumlah kecil (12 citra DICOM); P3 (30 citra 8-bit non-DICOM); P1 tidak merinci jumlah citra.
 5. **Kompleksitas komputasi sering tidak dilaporkan.** P2 dan P3 tidak menyediakan embedding/extraction time; P1 lambat (93 detik) untuk skala real-time.
 6. **Belum ada kombinasi reversible watermarking + tamper recovery + kriptografi modern + evaluasi multi-modal dalam satu framework.** Ini adalah celah penelitian yang dapat diisi oleh jurnal baru.
 
