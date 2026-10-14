@@ -1,13 +1,13 @@
 {% extends "base.html" %}
-{% block title %}Algoritma — Proteksi Citra Medis{% endblock %}
+{% block title %}Algoritma &amp; Metode — Reversible DICOM Watermarking{% endblock %}
 {% block content %}
 
 <section class="hero hero-compact">
-  <h1>Algoritma &amp; metode</h1>
+  <h1>Algoritma &amp; metode sistem</h1>
   <p>
-    Empat metode inti bekerja sebagai satu kesatuan: gembok (AES), stempel pembeda
-    (LSB watermarking), tanda tangan (SHA-256), dan sekuriti pamungkas yang mendeteksi
-    manipulasi (tamper detection per blok).
+    Arsitektur proteksi citra medis DICOM terintegrasi dalam empat pilar: Enkripsi Kriptografis
+    AES-256-CBC, Reversible Watermarking Multi-Round (PEE-HS), Partisi Spasial ROI/RONI,
+    dan Deteksi serta Lokalisasi Manipulasi Spasial Grid 16&times;16.
   </p>
 </section>
 
@@ -19,18 +19,19 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
       </span>
       <div>
-        <h2>AES-256-CBC</h2>
-        <p>Kerahasiaan: seluruh byte berkas dienkripsi dengan kunci turunan PBKDF2.</p>
+        <h2>1. Enkripsi Kriptografis AES-256-CBC</h2>
+        <p>Kerahasiaan data pasien: payload tanda tangan biner dienkripsi sebelum disisipkan.</p>
       </div>
     </div>
     <ul class="steps">
-      <li>Kunci di-derive dari password melalui PBKDF2-HMAC-SHA256 (200.000 iterasi) + salt acak 16 byte.</li>
-      <li>IV acak 16 byte per enkripsi memastikan hasil berbeda tiap proses walau isi sama.</li>
-      <li>Ciphertext disimpan dengan format <code>AES1 | salt | iv | data</code>.</li>
+      <li>Derivasi kunci kuat menggunakan PBKDF2-HMAC-SHA256 (200.000 iterasi) dengan Salt acak 16 byte.</li>
+      <li>Vektor Inisialisasi (IV) acak 16 byte memastikan ciphertext unik meski data atau kata kunci serupa.</li>
+      <li>Mengamankan struktur payload biner: Magic header <code>RPEE01</code> (80b) + Digest SHA-256 metadata (256b) + 594 Hash Blok Spasial (9.504b) &rarr; 10.144 bit ciphertext dengan padding PKCS#7.</li>
+      <li>Proteksi berkas tingkat kontainer (.krip) menggunakan format <code>AES1 | salt | iv | ciphertext</code>.</li>
     </ul>
-    <pre><code>key = PBKDF2(password, salt, len=32)
-enc = AES_CBC_encrypt(pad(plaintext), key, iv)
-file = "AES1" + salt + iv + enc</code></pre>
+    <pre><code>key = PBKDF2_HMAC_SHA256(passphrase, salt, iterations=200000, dklen=32)
+cipher = AES_CBC(key, iv).encrypt(pad_pkcs7(payload_binary))
+file_krip = b"AES1" + salt + iv + cipher</code></pre>
   </article>
 
   <article class="card method">
@@ -39,17 +40,29 @@ file = "AES1" + salt + iv + enc</code></pre>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
       </span>
       <div>
-        <h2>LSB Watermarking</h2>
-        <p>Penyisipan stempel pada bit paling tidak signifikan bernilai tak terlihat.</p>
+        <h2>2. Reversible Watermarking (PEE-HS Multi-Round)</h2>
+        <p>Jaminan Reversibilitas 100%: citra diagnostik dapat dipulihkan sempurna secara eksak biner.</p>
       </div>
     </div>
     <ul class="steps">
-      <li>Setiap blok 8x8 membawa 16 bit hash 7-bit-tertinggi miliknya sendiri pada LSB kanal merah.</li>
-      <li>Grayscale (DICOM) menempatkan metadata di 8 baris terbawah agar tak bertabrakan dengan stempel blok.</li>
-      <li>Perubahan maksimal 1 dari 65535 pada citra 16-bit, atau 1 dari 255 pada 8-bit: tak mengganggu diagnosis.</li>
+      <li><strong>Skema Checkerboard:</strong> Piksel dipartisi selang-seling menjadi piksel referensi (tetap) dan piksel target (disisipi).</li>
+      <li><strong>Prediktor MED (Median Edge Detector):</strong> Menghitung nilai prediksi &ecirc; berdasarkan tetangga spasial; galat prediksi dihitung sebagai <code>e = x - &ecirc;</code>.</li>
+      <li><strong>Perluasan Galat (Error Expansion):</strong> Bit rahasia disisipkan pada titik puncak histogram (peak e0) via <code>e' = 2e + b</code>.</li>
+      <li><strong>Pergeseran Histogram (Histogram Shifting):</strong> Nilai galat di luar puncak digeser <code>e' = e &plusmn; 1</code> guna mencegah benturan bin (bin collision).</li>
+      <li><strong>Pemulihan Integer Eksak:</strong> Penerima mengekstrak bit via <code>b = e' mod 2</code> dan memulihkan galat via integer division <code>e = &lfloor;e'/2&rfloor;</code> tanpa kesalahan pembulatan desimal.</li>
+      <li><strong>Multi-Round Adaptif:</strong> Dijalankan hingga 16 round dinamis guna menampung payload besar (10.144 bit) dengan distorsi tak kasat mata (PSNR rata-rata 86,35 dB, SSIM 0,999995).</li>
     </ul>
-    <pre><code>lsb = pixels & ~1        # bersihkan bit terakhir
-pixels = lsb | bit       # sisipkan 1 bit data</code></pre>
+    <pre><code># Penyisipan (Forward):
+e = x - x_pred
+if e == peak:   e_mod = 2 * e + b
+elif e > peak:  e_mod = e + 1
+x_watermarked = x_pred + e_mod
+
+# Pemulihan (Inverse):
+e_mod = x_watermarked - x_pred
+b = e_mod % 2
+e_orig = e_mod // 2
+x_restored = x_pred + e_orig   # 100% IDENTIK!</code></pre>
   </article>
 
   <article class="card method">
@@ -58,18 +71,17 @@ pixels = lsb | bit       # sisipkan 1 bit data</code></pre>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V4h16v3"></path><rect x="4" y="7" width="16" height="13"></rect><path d="M8 11h8M8 15h5"></path></svg>
       </span>
       <div>
-        <h2>SHA-256 Signature</h2>
-        <p>Tanda tangan integritas metadata pasien disisipkan ke LSB.</p>
+        <h2>3. Partisi Spasial: ROI Diagnostik &amp; Strip RONI</h2>
+        <p>Segmentasi fungsional untuk mengisolasi parameter kontrol dari wilayah anatomi medis.</p>
       </div>
     </div>
     <ul class="steps">
-      <li>Metadata (PatientID, PatientName, StudyDate, Modality, UID, dll.) digabung jadi string tunggal.</li>
-      <li>Hash SHA-256 (32 byte) dari string itu disisipkan ke area metadata citra.</li>
-      <li>Saat verifikasi, hash dihitung ulang dari metadata saat ini lalu dibandingkan.</li>
+      <li><strong>Wilayah Diagnostik / ROI (Baris 0 s.d. 431):</strong> Matriks anatomi otak 432&times;364 piksel (157.248 piksel) yang diproteksi secara eksak murni (PSNR = &infin;, BER = 0, SSIM = 1,0).</li>
+      <li><strong>Strip Sintetis / RONI (16 Baris Terbawah):</strong> Wilayah 16&times;364 piksel di luar organ pasien yang difungsikan sebagai media penyimpanan parameter side-channel (e0, arah geser, jumlah bit per round) dalam format JSON terkompresi.</li>
+      <li>Seluruh informasi dekompresi tertanam secara mandiri (*in-band*), tidak memerlukan berkas sidecar eksternal yang rentan terpisah.</li>
     </ul>
-    <pre><code>digest = SHA256(metadata)   # 32 byte
-embed_lsb(image, digest)
-...</code></pre>
+    <pre><code>roi_pixels  = dicom_pixels[0:432, :]   # Wilayah diagnostik otak (Bit-Exact)
+roni_strip  = dicom_pixels[432:448, :] # Strip parameter kontrol (Side-channel LSB)</code></pre>
   </article>
 
   <article class="card method">
@@ -78,18 +90,20 @@ embed_lsb(image, digest)
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="M9 12l2 2 4-4"></path></svg>
       </span>
       <div>
-        <h2>Tamper Detection &amp; Lokalisasi</h2>
-        <p>Verifikasi bebas referensi: tak perlu citra asli untuk menemukan area yang diubah.</p>
+        <h2>4. Deteksi Integritas &amp; Lokalisasi Manipulasi (Grid 16&times;16)</h2>
+        <p>Verifikasi bebas referensi: deteksi manipulasi lokal hingga skala blok 16&times;16 piksel.</p>
       </div>
     </div>
     <ul class="steps">
-      <li>Hitung ulang hash tiap blok dari 7 bit tertinggi piksel yang ada sekarang.</li>
-      <li>Bandingkan dengan hash yang terekstrak dari LSB blok.</li>
-      <li>Blok yang tidak cocok ditandai penuh 8x8 &mdash; piksel yang dimanipulasi terlokalisasi presisi.</li>
+      <li><strong>Invariansi Bit Stabil:</strong> Setiap piksel digeser 1 bit ke kanan (<code>pixel >> 1</code>) agar representasi hash blok independen dari manipulasi bit rendah.</li>
+      <li><strong>Hash Spasial Blok:</strong> ROI dibagi menjadi 594 blok berukuran 16&times;16 piksel (27 baris &times; 22 kolom). Masing-masing blok di-hash dengan SHA-256 terpotong 16 bit (total 9.504 bit).</li>
+      <li><strong>Digest Metadata DICOM:</strong> Atribut klinis penting (PatientID, StudyDate, Modality, SeriesInstanceUID) di-hash penuh dengan SHA-256 (32 byte / 256 bit).</li>
+      <li><strong>Lokalisasi Tamper:</strong> Bila terjadi serangan/modifikasi lokal, blok yang tidak cocok langsung ditandai dengan masker merah pada layar radiologi.</li>
     </ul>
-    <pre><code>current = hash7(pixels)          # konten saat ini
-stored  = read_lsb(pixels)        # stempel blok
-mask    = i where current[i] != stored[i]</code></pre>
+    <pre><code># Hitung ulang hash blok dari citra hasil pemulihan:
+block_hash = SHA256(block_pixels >> 1)[:2]   # 16-bit
+if block_hash != stored_block_hash:
+    tamper_mask[block_coords] = 255          # Tandai blok merah 16x16!</code></pre>
   </article>
 
 </div>

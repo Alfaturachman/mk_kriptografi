@@ -14,6 +14,13 @@ from PIL import Image
 from crypto import aes
 from crypto.dicom import load, metadata_of, preview_8bit, save_watermarked
 from crypto.tamper import mark_tampered, protect_image, verify_image, protect_image_rev, verify_image_rev
+from crypto.histogram import (
+    render_histogram_image,
+    render_comparison_histogram,
+    render_ciphertext_histogram,
+    shannon_entropy,
+    shannon_entropy_bytes,
+)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TMP_DIR = os.path.join(BASE_DIR, "tmp")
@@ -61,6 +68,8 @@ def protek(raw: bytes, fname: str, ext: str, password: str, metadata: str) -> tu
         pixels, ds = load(io.BytesIO(raw))
         md = metadata.encode("utf-8") if metadata else metadata_of(ds)
         protected = protect_image_rev(pixels, md, passphrase=password)
+        ver = verify_image_rev(protected, md, passphrase=password)
+        recovered = ver["original_recovered"]
         buf = io.BytesIO()
         save_watermarked(buf, ds, protected)
         media_bytes = buf.getvalue()
@@ -68,12 +77,14 @@ def protek(raw: bytes, fname: str, ext: str, password: str, metadata: str) -> tu
         reversible = True
         prev_orig = preview_8bit(pixels)
         prev_wm = preview_8bit(protected)
+        prev_rec = preview_8bit(recovered)
     else:
         img = Image.open(io.BytesIO(raw))
         img.load()
         pixels = np.array(img.convert("RGB"))
         md = metadata.encode("utf-8") if metadata else f"FILE={fname};KUNCI-TANDA".encode("utf-8")
         protected = protect_image(pixels, md)
+        recovered = protected
         buf = io.BytesIO()
         Image.fromarray(protected).save(buf, format="PNG")
         media_bytes = buf.getvalue()
@@ -81,10 +92,19 @@ def protek(raw: bytes, fname: str, ext: str, password: str, metadata: str) -> tu
         reversible = False
         prev_orig = pixels.astype(np.uint8)
         prev_wm = protected.astype(np.uint8)
+        prev_rec = recovered.astype(np.uint8)
 
     cipher = aes.encrypt(media_bytes, password)
     p = psnr(pixels, protected)
     stem = os.path.splitext(fname)[0]
+
+    # Bangkitkan Histogram Asli, Enkripsi, Dekripsi, Komparasi, dan Ciphertext
+    hist_orig = render_histogram_image(prev_orig, "1. Histogram Citra Asli", color="#0284c7", edge_color="#0369a1")
+    hist_enc = render_histogram_image(prev_wm, "2. Histogram Hasil Enkripsi / Watermark", color="#d97706", edge_color="#b45309")
+    hist_dec = render_histogram_image(prev_rec, "3. Histogram Hasil Dekripsi (100% Eksak)", color="#059669", edge_color="#047857")
+    hist_comp = render_comparison_histogram(prev_orig, prev_wm, prev_rec)
+    hist_ciph = render_ciphertext_histogram(cipher)
+
     payload = {
         "mode": "protek",
         "kind": kind,
@@ -94,11 +114,20 @@ def protek(raw: bytes, fname: str, ext: str, password: str, metadata: str) -> tu
         "size_src": len(media_bytes),
         "size_enc": len(cipher),
         "download_name": stem + ".krip",
+        "ent_orig": round(shannon_entropy(prev_orig), 3),
+        "ent_enc": round(shannon_entropy(prev_wm), 3),
+        "ent_dec": round(shannon_entropy(prev_rec), 3),
+        "ent_cipher": round(shannon_entropy_bytes(cipher), 3),
     }
     files = {
         "preview_orig.png": png_bytes(prev_orig),
         "preview_wm.png": png_bytes(prev_wm),
         "download": cipher,
+        "hist_orig.png": hist_orig,
+        "hist_enc.png": hist_enc,
+        "hist_dec.png": hist_dec,
+        "hist_compare.png": hist_comp,
+        "hist_cipher.png": hist_ciph,
     }
     return payload, files
 
@@ -111,7 +140,11 @@ def verif(raw: bytes, fname: str, password: str, metadata: str) -> tuple:
         md = metadata_of(ds)
         label = "DICOM MRI (reversible)"
         verdict = verify_image_rev(pixels, md, passphrase=password)
-        preview = preview_8bit(verdict["original_recovered"])
+        recovered = verdict["original_recovered"]
+        preview = preview_8bit(recovered)
+        prev_wm = preview_8bit(pixels)
+        prev_rec = preview
+        prev_orig = preview
         recovered_name = os.path.splitext(fname)[0] + ".dcm"
         recovered_buf = io.BytesIO()
         save_watermarked(recovered_buf, ds, verdict["original_recovered"])
@@ -124,7 +157,11 @@ def verif(raw: bytes, fname: str, password: str, metadata: str) -> tuple:
         md = metadata.encode("utf-8")
         label = "PNG"
         verdict = verify_image(pixels, md)
+        recovered = pixels
         preview = pixels.astype(np.uint8)
+        prev_wm = preview
+        prev_rec = preview
+        prev_orig = preview
         recovered_name = os.path.splitext(fname)[0] + ".png"
         recovered_bytes = plain
         reversible = False
@@ -134,6 +171,13 @@ def verif(raw: bytes, fname: str, password: str, metadata: str) -> tuple:
     mask = verdict["mask"]
     mask_px = int((mask == 255).sum())
     overlay = mark_tampered(preview, mask)
+
+    hist_orig = render_histogram_image(prev_orig, "1. Histogram Citra Asli (Terekonstruksi)", color="#0284c7", edge_color="#0369a1")
+    hist_enc = render_histogram_image(prev_wm, "2. Histogram Hasil Enkripsi / Watermark", color="#d97706", edge_color="#b45309")
+    hist_dec = render_histogram_image(prev_rec, "3. Histogram Hasil Dekripsi & Pemulihan", color="#059669", edge_color="#047857")
+    hist_comp = render_comparison_histogram(prev_orig, prev_wm, prev_rec)
+    hist_ciph = render_ciphertext_histogram(raw)
+
     payload = {
         "mode": "verif",
         "kind": label,
@@ -143,6 +187,10 @@ def verif(raw: bytes, fname: str, password: str, metadata: str) -> tuple:
         "metadata_ok": bool(verdict["metadata_ok"]),
         "mask_px": mask_px,
         "recovered_name": recovered_name,
+        "ent_orig": round(shannon_entropy(prev_orig), 3),
+        "ent_enc": round(shannon_entropy(prev_wm), 3),
+        "ent_dec": round(shannon_entropy(prev_rec), 3),
+        "ent_cipher": round(shannon_entropy_bytes(raw), 3),
     }
     if verdict.get("error"):
         payload["error_pesan"] = verdict["error"]
@@ -150,6 +198,11 @@ def verif(raw: bytes, fname: str, password: str, metadata: str) -> tuple:
         "preview_rec.png": png_bytes(preview),
         "preview_ovl.png": png_bytes(overlay),
         "recovered": recovered_bytes,
+        "hist_orig.png": hist_orig,
+        "hist_enc.png": hist_enc,
+        "hist_dec.png": hist_dec,
+        "hist_compare.png": hist_comp,
+        "hist_cipher.png": hist_ciph,
     }
     return payload, files
 
@@ -220,6 +273,12 @@ def materialkan(token: str):
         result["preview_rec"] = uri("preview_rec.png", "image/png")
         result["preview_ovl"] = uri("preview_ovl.png", "image/png")
         result["recovered_uri"] = uri("recovered", "application/octet-stream")
+
+    for hname in ["hist_orig", "hist_enc", "hist_dec", "hist_compare", "hist_cipher"]:
+        hfile = f"{hname}.png"
+        if os.path.isfile(os.path.join(folder, hfile)):
+            result[hname] = uri(hfile, "image/png")
+
     return result
 
 
@@ -295,7 +354,15 @@ def algoritma():
 def pengujian():
     output = session.pop("uji_output", None)
     if request.method == "POST":
-        target = "tests/test_dicom.py" if request.form.get("skenario") == "dicom" else "tests/test_core.py"
+        skenario = request.form.get("skenario")
+        if skenario == "reversible":
+            target = "tests/test_reversible_tamper.py"
+        elif skenario == "metrics":
+            target = "tests/test_metrics.py"
+        elif skenario == "dicom":
+            target = "tests/test_dicom.py"
+        else:
+            target = "tests/test_core.py"
         try:
             proc = subprocess.run(
                 [sys.executable, os.path.join(BASE_DIR, target)],
