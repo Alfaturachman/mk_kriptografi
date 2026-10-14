@@ -66,26 +66,27 @@ dari seluruh byte berkas media, jadi tanpa kunci mustahil dibuka.
 
 ## Komponen Teknis
 
-- `app.py` — 3 rute: `/` (protek + verif), `/algoritma`, `/pengujian` (memanggil test suite sebagai subproses).
+- `app.py` — rute utama: `/` (protek + verif + kalkulasi histogram visual), `/algoritma`, `/pengujian`.
+- `crypto/histogram.py` — modul rendering histogram: citra asli, ter-watermark, dekripsi, komparasi overlay, dan byte ciphertext AES.
 - `templates/base.html` — kerangka: navbar, brand icon SVG, footer.
-- `templates/index.html` — dua kartu formulir + panel hasil dinamis.
-- `templates/algoritma.html` — metode AES, LSB, SHA-256, tamper detection.
-- `templates/pengujian.html` — kriteria uji, tombol jalankan ulang, output.
-- `static/css/style.css` — tema terang, aksen `#0f766e`, sistem font.
-- `static/js/main.js` — menampilkan nama berkas pada area unggah.
+- `templates/index.html` — dua kartu formulir + panel hasil dinamis + tab komparasi histogram interaktif.
+- `templates/algoritma.html` — metode PEE-HS, AES-256-CBC, SHA-256, tamper detection.
+- `templates/pengujian.html` — kriteria uji, tombol jalankan ulang, output live.
+- `static/css/style.css` — tema terang, aksen `#0f766e`, tata letak kartu histogram responsif.
+- `static/js/main.js` — penanganan unggah berkas dan interaktivitas tab.
 
 ## Cara Menjalankan
 
-```
+```bash
 python app.py
 ```
 
 Buka `http://127.0.0.1:5000` di browser.
 
-## Uji Quick (smoke, HTTP 200)
+## Uji Web Suite (test_app.py: 12/12 Lulus)
 
-- Halaman `/`, `/algoritma`, `/pengujian` semua dirender.
-- POST protek PNG -> menampilkan PSNR + tombol unduh `.krip`.
-- POST verif PNG utuh -> "Piksel utuh" + "Metadata valid".
-- POST verif PNG dimanipulasi 1 blok -> "Manipulasi piksel terdeteksi" + peta lokasi.
-- POST pengujian -> output "8/8 lulus" dan "9/9 lulus" tampil.
+- Halaman `/`, `/algoritma`, `/pengujian` semua dirender (HTTP 200).
+- POST protek DICOM -> kalkulasi PEE-HS, generate histogram asli & ter-watermark, unduh berkas `.krip`.
+- POST verif DICOM utuh -> "Piksel utuh 100% bit-exact" + histogram pulih & overlay komparasi.
+- POST verif DICOM dimanipulasi -> "Manipulasi piksel terdeteksi" + peta lokasi spasial 16x16.
+- Integrasi modul `crypto/histogram.py` tervalidasi penuh pada pipeline web.

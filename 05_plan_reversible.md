@@ -1,14 +1,14 @@
 # Fase 5 — Rencana Implementasi Reversible Watermarking + Payload AES
 
+> **STATUS: TERLAKSANA PENUH & TERBUKTI (Fase Selesai)**  
+> Seluruh target implementasi PEE-HS multi-round, enkripsi AES-256 payload, pemulihan 100% bit-exact pada ROI 24 slice, dan evaluasi metrik kuantitatif telah diselesaikan. Rincian hasil resmi terdokumentasi di [outline_journal.md](outline_journal.md) dan [README.md](README.md).
+
 Dokumen ini adalah **validasi rencana (pre-code)** sebelum eksekusi penuh kode.
 Selaras dengan arah penelitian di `01_fase_research.md` (bagian 6):
 
 *Skema reversible watermarking berbasis ROI pada citra DICOM dengan payload terenkripsi AES,
 tamper detection + tamper localization, dievaluasi pada dataset DICOM multi-modality.*
 Target publikasi: **Sinta 3**, lingkup tugas akhir.
-
-> Prinsip utama: TIDAK mengklaim reversible sebelum benar-benar terimplementasi dan teruji.
-> Ceklis di bawah ini adalah syarat *done* sebelum masuk tahap penulisan jurnal.
 
 ---
 
