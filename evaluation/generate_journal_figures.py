@@ -56,17 +56,17 @@ def generate_figure_windowing():
 
     # Panel A: Raw naive
     axes[0, 0].imshow(raw_naive, cmap='gray', vmin=0, vmax=255)
-    axes[0, 0].set_title("(a) Tampilan Mentah 16-bit Tanpa Windowing\n(Maks: 1.433 / 65.535 = 2,2% Gray — Tampak Gelap)")
+    axes[0, 0].set_title("(a) Tampilan Mentah 16-bit Tanpa Windowing\n(Maks: 1.433 / 65.535 = 2,2% Gray - Tampak Gelap)")
     axes[0, 0].axis('off')
 
     # Panel B: Clinical Windowing
     axes[0, 1].imshow(win_img, cmap='gray')
-    axes[0, 1].set_title("(b) Tampilan Windowing Klinis Radiologi\n(Window Center: 500, Window Width: 1000 — Detail Jelas)")
+    axes[0, 1].set_title("(b) Tampilan Windowing Klinis Radiologi\n(Window Center: 500, Window Width: 1000 - Detail Jelas)")
     axes[0, 1].axis('off')
 
     # Panel C: Min-Max Normalization
     axes[1, 0].imshow(minmax_img, cmap='gray')
-    axes[1, 0].set_title(f"(c) Normalisasi Min-Max Skala Penuh\n(Rentang Riil: {p_min} – {p_max} — Kontras Maksimal)")
+    axes[1, 0].set_title(f"(c) Normalisasi Min-Max Skala Penuh\n(Rentang Riil: {p_min} - {p_max} - Kontras Maksimal)")
     axes[1, 0].axis('off')
 
     # Panel D: Histogram
