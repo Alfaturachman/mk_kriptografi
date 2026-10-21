@@ -216,6 +216,7 @@ python tests/test_multi_slice.py
 - [katalog_visualisasi_riset.md](katalog_visualisasi_riset.md): Katalog komprehensif seluruh grafik, diagram alur, dan analisis visual riset.
 - [journal_flow_diagram.md](journal_flow_diagram.md): Diagram alur end-to-end, matriks transformasi, dan pembuktian matematis reversibilitas.
 - [journal_guide.md](journal_guide.md): Panduan presentasi naratif dan tanya-jawab bimbingan/sidang dosen.
+- [faq_tanya_jawab_sidang_dosen.md](faq_tanya_jawab_sidang_dosen.md): Panduan komprehensif tanya-jawab kritis sidang & ujian dosen (modulo, UACI, AES, PEE, dll.).
 - [01_review_literature.md](01_review_literature.md): Telaah literatur 4 paper pembanding dan analisis research gap.
 - [02_prototype.md](02_prototype.md): Dokumentasi pengujian prototipe awal 8-bit sintetis.
 - [03_fase_dicom_integration.md](03_fase_dicom_integration.md): Dokumentasi integrasi DICOM 16-bit grayscale awal.
