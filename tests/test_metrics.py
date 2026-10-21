@@ -57,6 +57,49 @@ def main():
     agg = mt.summarize_confusion([r, r])
     check("agregasi merata", "precision" in agg and "recall" in agg, f"got={agg}")
 
+    print("== 10 Parameter Evaluasi Dosen ==")
+    # 1. MSE
+    check("calc_mse identik -> 0.0", mt.calc_mse(a16, a16) == 0.0)
+    check("calc_mse beda > 0", mt.calc_mse(a8, noisy) > 0.0)
+
+    # 2. PSNR
+    check("calc_psnr mse=0 -> inf", mt.calc_psnr(0.0) == float("inf"))
+    check("calc_psnr mse>0 -> finite", mt.calc_psnr(10.0, 65535.0) > 80.0)
+
+    # 3. SSIM Robust
+    check("calc_ssim_robust 2D -> 1.0", mt.calc_ssim_robust(a16, a16) == 1.0)
+
+    # 4. NPCR & UACI
+    check("calc_npcr identik -> 0.0", mt.calc_npcr(a16, a16) == 0.0)
+    check("calc_npcr beda > 0", mt.calc_npcr(a8, noisy) > 0.0)
+    check("calc_uaci identik -> 0.0", mt.calc_uaci(a16, a16) == 0.0)
+    check("calc_uaci beda > 0", mt.calc_uaci(a8, noisy, 255.0) > 0.0)
+
+    # 5. Entropy
+    check("calc_entropy > 0", mt.calc_entropy(a8) > 5.0)
+    check("calc_entropy_bytes > 0", mt.calc_entropy_bytes(b"sample ciphertext bytes 1234567890" * 10) > 3.0)
+
+    # 6. NC & NCC
+    check("calc_nc identik -> 1.0", abs(mt.calc_nc(a16, a16) - 1.0) < 1e-6)
+    check("calc_ncc identik -> 1.0", abs(mt.calc_ncc(a16, a16) - 1.0) < 1e-6)
+
+    # 7. Chi-Square
+    check("calc_chi_square_hist identik -> 0.0", mt.calc_chi_square_hist(a8, a8) == 0.0)
+    chi2_val, p_val = mt.calc_chi_square_uniformity_bytes(b"uniform_bytes_sample" * 20)
+    check("calc_chi_square_uniformity_bytes -> tuple", chi2_val >= 0.0 and 0.0 <= p_val <= 1.0)
+
+    # 8. BER
+    check("calc_ber identik -> 0.0", mt.calc_ber(a16, a16) == 0.0)
+    check("calc_ber beda > 0", mt.calc_ber(a8, noisy) > 0.0)
+
+    # 9. evaluate_comprehensive_metrics
+    eval_res = mt.evaluate_comprehensive_metrics(a16, a16, rec=a16, cipher_bytes=b"cipher" * 50, is_dicom=False)
+    check("eval_res mse_rec -> 0.0", eval_res["mse_rec"] == 0.0)
+    check("eval_res psnr_rec -> inf", eval_res["psnr_rec"] == float("inf"))
+    check("eval_res ssim_rec -> 1.0", eval_res["ssim_rec"] == 1.0)
+    check("eval_res ber_rec -> 0.0", eval_res["ber_rec"] == 0.0)
+    check("eval_res ber_rec_str formatted", eval_res["ber_rec_str"] == "0.00000000")
+
     print(f"\nHasil: {total - len(failures)}/{total}")
     return len(failures) == 0
 
