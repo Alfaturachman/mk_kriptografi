@@ -18,32 +18,35 @@ Target Publikasi: **Jurnal Ilmiah Nasional Terakreditasi Sinta 3 / Prosiding Int
 - **Modalitas Eksperimen:**  
   24 slice aksial volume MRI Brain (`BrainTumorMRI`) format DICOM 16-bit (`uint16`, dynamic range 0–1513, dimensi $448 \times 364$ piksel).
 - **Zonasi Spasial Citra:**
-  - **ROI Diagnostik:** 432 baris teratas ($432 \times 364 = 157.248$ piksel) — diproteksi secara eksak biner 100%.
-  - **Strip RONI:** 16 baris terbawah ($16 \times 364 = 5.824$ piksel) — menyimpan parameter kontrol dekompresi PEE via LSB.
+  - **ROI Diagnostik:** 432 baris teratas ($432 \times 364 = 157.248$ piksel) - diproteksi secara eksak biner 100%.
+  - **Strip RONI:** 16 baris terbawah ($16 \times 364 = 5.824$ piksel) - menyimpan parameter kontrol dekompresi PEE via LSB.
 - **Kapasitas Payload:**
   Header (80 bit) + Metadata Digest SHA-256 (256 bit) + 594 Hash Blok Spasial (9.504 bit) = 9.840 bit plaintext $\rightarrow$ **10.144 bit ciphertext AES-256**.
 
 ## 2. Hasil Evaluasi Kuantitatif Komprehensif
 
-Pengujian kuantitatif dilakukan pada seluruh 24 slice volume aksial MRI Brain (`BrainTumorMRI`) format DICOM 16-bit. Seluruh metrik imperseptibilitas, integritas, kualitas rekonstruksi, dan sifat statistik dievaluasi secara otomatis (tersimpan di [lecturer_metrics_results.json](evaluation/lecturer_metrics_results.json) dan dilaporkan lengkap di [laporan_evaluasi_metrik_dosen.md](laporan_evaluasi_metrik_dosen.md)):
+Pengujian kuantitatif dilakukan pada seluruh 24 slice volume aksial MRI Brain (`BrainTumorMRI`) format DICOM 16-bit. Seluruh 10 parameter imperseptibilitas, integritas, kualitas rekonstruksi, dan sifat statistik dievaluasi secara otomatis (tersimpan di [lecturer_metrics_results.json](evaluation/lecturer_metrics_results.json) dan dilaporkan lengkap di [laporan_evaluasi_metrik_dosen.md](laporan_evaluasi_metrik_dosen.md)):
 
-| Kategori Evaluasi | Metrik | Target Teori | Hasil Terukur (24 Slice MRI) | Status |
+| Kategori Evaluasi | Parameter / Metrik | Target Teori | Hasil Terukur (24 Slice MRI) | Status |
 |---|---|---|---|:---:|
 | **Rekonstruksi ROI Medis** | **Recovery PSNR** | $\infty$ (Tak-Hingga) | **$\infty$ (Bit-Exact Eksak 24/24)** | **Tercapai** |
 | | **Recovery SSIM** | 1,000000 | **1,000000** | **Tercapai** |
 | | **Recovery BER** | 0,00000000 | **0,00000000 (0 bit salah)** | **Tercapai** |
-| | **Normalized Correlation (NC)** | 1,000000 | **1,000000** | **Tercapai** |
-| | **Normalized Cross-Correlation (NCC)** | 1,000000 | **1,000000** | **Tercapai** |
-| **Imperseptibilitas Watermark** | **Watermarked PSNR (16-bit dynamic)** | $\ge 60$ dB | **86,18 ± 1,97 dB** (83,72 – 90,37 dB) | **Tercapai** |
-| | **Watermarked PSNR (12-bit stored)** | $\ge 50$ dB | **62,10 ± 1,97 dB** (59,64 – 66,29 dB) | **Tercapai** |
-| | **Mean Squared Error (MSE 16-bit)** | Mendekati 0 | **11,36 ± 4,52** (4,32 – 19,95) | **Tercapai** |
-| | **Mean Squared Error (MSE 12-bit)** | Mendekati 0 | **0,044 ± 0,018** (0,017 – 0,078) | **Tercapai** |
-| | **SSIM Citra Ter-watermark** | $\ge 0,999$ | **0,999995 ± 0,000002** | **Tercapai** |
-| | **NPCR (Watermarked vs Asli)** | Sangat rendah | **14,37 ± 0,39%** (imperceptible) | **Tercapai** |
-| | **UACI (Watermarked vs Asli)** | Sangat rendah | **0,0018 ± 0,0004%** (tak kasat mata) | **Tercapai** |
-| **Karakteristik Statistik** | **Entropi Informasi Citra Asli** | Identik | **4,7071 ± 0,3816** bit/piksel | **Tercapai** |
-| | **Entropi Citra Ter-watermark** | $\Delta H \le 0,001$ | **4,7066 ± 0,3815** bit/piksel ($\Delta H = 0,0005$) | **Tercapai** |
-| | **Chi-Square Uniformity Test ($X^2$)** | $p > 0,05$ | **$p = 1,0000$** (Distribusi identik) | **Tercapai** |
+| | **Recovery NC & NCC** | 1,000000 | **1,000000** | **Tercapai** |
+| **Imperseptibilitas Watermark** | **Watermarked PSNR (16-bit dynamic)** | $\ge 60$ dB | **86,19 ± 1,97 dB** (83,57 - 90,22 dB) | **Tercapai** |
+| | **Watermarked PSNR (12-bit stored)** | $\ge 50$ dB | **62,11 ± 1,97 dB** (59,48 - 66,14 dB) | **Tercapai** |
+| | **Mean Squared Error (MSE 16-bit)** | Mendekati 0 | **11,33 ± 4,51** (4,08 - 18,89) | **Tercapai** |
+| | **SSIM Citra Ter-watermark** | $\ge 0,999$ | **0,999995 ± 0,000002** (0,999991 - 0,999998) | **Tercapai** |
+| | **NPCR (Watermarked vs Asli)** | Sangat rendah (< 20%) | **14,37 ± 0,39%** (13,60% - 15,05%) | **Tercapai** |
+| | **UACI (Watermarked vs Asli, 16-bit)** | Sangat rendah (< 0,01%) | **0,0018 ± 0,0004%** (0,0011% - 0,0024%) | **Tercapai** |
+| | **UACI (Watermarked vs Asli, 12-bit)** | Sangat rendah (< 0,05%) | **0,0290 ± 0,0063%** (0,0180% - 0,0386%) | **Tercapai** |
+| **Karakteristik Statistik & Korelasi** | **Entropi Citra Asli (Shannon)** | Identik | **8,9953 ± 0,3310 bit** (7,98 - 9,39 bit) | **Tercapai** |
+| | **Entropi Citra Ter-watermark** | Stabil ($\Delta H \le 0,02$) | **9,0103 ± 0,3294 bit** ($\Delta H = 0,0151 \pm 0,0035$) | **Tercapai** |
+| | **Entropi Ciphertext Payload AES** | Mendekati 8,0 bit/B | **7,8457 ± 0,0147 bit/B** (7,81 - 7,87 bit/B) | **Tercapai** |
+| | **Normalized Correlation (NC)** | $\ge 0,999$ | **0,999958 ± 0,000013** (0,999935 - 0,999979) | **Tercapai** |
+| | **Normalized Cross-Correlation (NCC)** | $\ge 0,999$ | **0,999921 ± 0,000031** (0,999861 - 0,999974) | **Tercapai** |
+| | **Chi-Square Jarak Histogram ($X^2$)** | Minim | **172,67 ± 15,40** (139,28 - 199,42) | **Tercapai** |
+| | **Chi-Square Keseragaman AES ($X^2$)** | $p > 0,05$ | **$X^2 = 260,28 \pm 23,52$ ($p = 0,4381$)** | **Tercapai** |
 | **Keamanan & Komputasi** | **Deteksi Manipulasi (Tamper)** | 100% | **100% (32/32 skenario serangan)** | **Tercapai** |
 | | **Waktu Total (Embed + Verify)** | $\le 1,0$ detik | **0,279 detik per slice** | **Tercapai** |
 
@@ -109,7 +112,7 @@ medical_dicom_watermark/
 │
 ├── crypto/                            # Modul algoritma kriptografi & watermarking
 │   ├── reversible.py                  # PEE-HS checkerboard multi-round + integer transform
-│   ├── metrics.py                     # SSIM Gaussian, confusion matrix, & IoU lokalisasi
+│   ├── metrics.py                     # SSIM, confusion matrix, & 10 parameter evaluasi dosen
 │   ├── aes.py                         # AES-256-CBC + derivasi kunci PBKDF2 (200k iterasi)
 │   ├── tamper.py                      # Integrasi proteksi reversible, deteksi, & masking
 │   ├── watermark.py                   # Utilitas manipulasi LSB & bitstream
@@ -154,11 +157,11 @@ medical_dicom_watermark/
 │
 └── tests/                             # Suite pengujian unit dan integrasi
     ├── test_reversible_tamper.py      # Uji Reversible PEE-HS & deteksi tamper (15 uji)
-    ├── test_metrics.py                # Uji metrik SSIM & confusion matrix (14 uji)
+    ├── test_metrics.py                # Uji 10 parameter evaluasi dosen & SSIM (36 uji)
     ├── test_multi_slice.py            # Uji reversibilitas pada seluruh 24 slice MRI
     ├── test_dicom.py                  # Uji integrasi DICOM baseline (21 uji)
     ├── test_core.py                   # Uji prototipe inti baseline (8 uji)
-    └── test_app.py                    # Uji endpoint & integrasi Web GUI Flask (12 uji)
+    └── test_app.py                    # Uji endpoint & integrasi Web GUI Flask (21 uji)
 ```
 
 ---
@@ -174,9 +177,10 @@ Buka browser pada alamat: **`http://127.0.0.1:5000`**
 
 Fitur aplikasi web:
 1. **Beranda:** Mengunggah citra DICOM (`.dcm`), memasukkan passphrase, dan mengunduh berkas terproteksi `.krip`. Pada sisi verifikasi, mengunggah `.krip`, memasukkan passphrase, dan melihat visualisasi pemulihan bit-exact serta deteksi manipulasi.
-2. **Visualisasi Histogram Interaktif:** Menampilkan komparasi grafis langsung antara **Histogram Citra Asli**, **Histogram Citra Ter-watermark**, **Histogram Citra Pulih**, **Overlay Komparasi**, dan **Distribusi Byte Ciphertext AES-256**.
-3. **Algoritma:** Penjelasan interaktif mengenai PEE-HS, MED predictor, AES-256-CBC, dan grid lokalisasi 16x16.
-4. **Pengujian:** Menjalankan test suite Python secara live langsung dari browser.
+2. **Panel Evaluasi Kuantitatif 10 Parameter:** Kartu evaluasi interaktif real-time di Beranda menampilkan MSE, PSNR, SSIM, NPCR & UACI (imperceptibility), kestabilan entropi Shannon, NC & NCC, uji keseragaman Chi-Square ($X^2$), serta BER pemulihan biner 100% bit-exact dengan status badge responsif rata tengah.
+3. **Visualisasi Histogram Interaktif:** Menampilkan komparasi grafis langsung antara **Histogram Citra Asli**, **Histogram Citra Ter-watermark**, **Histogram Citra Pulih**, **Overlay Komparasi**, dan **Distribusi Byte Ciphertext AES-256**.
+4. **Algoritma:** Penjelasan interaktif mengenai PEE-HS, MED predictor, AES-256-CBC, dan grid lokalisasi 16x16.
+5. **Pengujian:** Menjalankan test suite Python secara live langsung dari browser, dilengkapi **Tabel Rekapitulasi 10 Parameter Evaluasi Dosen** dan tombol eksekusi 24 slice MRI lengkap.
 
 ### B. Menjalankan Pengukuran Metrik & Pembangkit Visualisasi
 
@@ -193,10 +197,13 @@ python evaluation/generate_journal_flowchart.py
 # 4. Uji Reversible PEE-HS & Tamper Detection (15/15 PASS):
 python tests/test_reversible_tamper.py
 
-# 5. Uji Web GUI & Multi-Histogram Rendering (12/12 PASS):
+# 5. Uji Web GUI, Endpoint & Panel Parameter (21/21 PASS):
 python tests/test_app.py
 
-# 6. Uji Komprehensif Seluruh 24 Slice MRI:
+# 6. Uji 10 Parameter Evaluasi Dosen & SSIM (36/36 PASS):
+python tests/test_metrics.py
+
+# 7. Uji Komprehensif Seluruh 24 Slice MRI:
 python tests/test_multi_slice.py
 ```
 
