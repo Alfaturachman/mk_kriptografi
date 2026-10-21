@@ -14,6 +14,7 @@ from PIL import Image
 from crypto import aes
 from crypto.dicom import load, metadata_of, preview_8bit, save_watermarked
 from crypto.tamper import mark_tampered, protect_image, verify_image, protect_image_rev, verify_image_rev
+from crypto.metrics import evaluate_comprehensive_metrics
 from crypto.histogram import (
     render_histogram_image,
     render_comparison_histogram,
@@ -75,6 +76,7 @@ def protek(raw: bytes, fname: str, ext: str, password: str, metadata: str) -> tu
         media_bytes = buf.getvalue()
         kind = "DICOM MRI (reversible)"
         reversible = True
+        bits_stored = getattr(ds, "BitsStored", 12)
         prev_orig = preview_8bit(pixels)
         prev_wm = preview_8bit(protected)
         prev_rec = preview_8bit(recovered)
@@ -90,6 +92,7 @@ def protek(raw: bytes, fname: str, ext: str, password: str, metadata: str) -> tu
         media_bytes = buf.getvalue()
         kind = "PNG"
         reversible = False
+        bits_stored = 8
         prev_orig = pixels.astype(np.uint8)
         prev_wm = protected.astype(np.uint8)
         prev_rec = recovered.astype(np.uint8)
@@ -97,6 +100,16 @@ def protek(raw: bytes, fname: str, ext: str, password: str, metadata: str) -> tu
     cipher = aes.encrypt(media_bytes, password)
     p = psnr(pixels, protected)
     stem = os.path.splitext(fname)[0]
+
+    # Evaluasi Parameter Kuantitatif Komprehensif (MSE, PSNR, SSIM, NPCR, UACI, Entropy, NC, NCC, Chi2, BER)
+    metrics_data = evaluate_comprehensive_metrics(
+        orig=pixels,
+        wm=protected,
+        rec=recovered,
+        cipher_bytes=cipher,
+        is_dicom=(ext == ".dcm"),
+        bits_stored=bits_stored,
+    )
 
     # Bangkitkan Histogram Asli, Enkripsi, Dekripsi, Komparasi, dan Ciphertext
     hist_orig = render_histogram_image(prev_orig, "1. Histogram Citra Asli", color="#0284c7", edge_color="#0369a1")
@@ -118,6 +131,7 @@ def protek(raw: bytes, fname: str, ext: str, password: str, metadata: str) -> tu
         "ent_enc": round(shannon_entropy(prev_wm), 3),
         "ent_dec": round(shannon_entropy(prev_rec), 3),
         "ent_cipher": round(shannon_entropy_bytes(cipher), 3),
+        "metrics": metrics_data,
     }
     files = {
         "preview_orig.png": png_bytes(prev_orig),
@@ -172,6 +186,18 @@ def verif(raw: bytes, fname: str, password: str, metadata: str) -> tuple:
     mask_px = int((mask == 255).sum())
     overlay = mark_tampered(preview, mask)
 
+    bits_stored = getattr(ds, "BitsStored", 12) if kind == "dicom" else 8
+
+    # Evaluasi Parameter Kuantitatif Komprehensif (MSE, PSNR, SSIM, NPCR, UACI, Entropy, NC, NCC, Chi2, BER)
+    metrics_data = evaluate_comprehensive_metrics(
+        orig=recovered,
+        wm=pixels,
+        rec=recovered,
+        cipher_bytes=raw,
+        is_dicom=(kind == "dicom"),
+        bits_stored=bits_stored,
+    )
+
     hist_orig = render_histogram_image(prev_orig, "1. Histogram Citra Asli (Terekonstruksi)", color="#0284c7", edge_color="#0369a1")
     hist_enc = render_histogram_image(prev_wm, "2. Histogram Hasil Enkripsi / Watermark", color="#d97706", edge_color="#b45309")
     hist_dec = render_histogram_image(prev_rec, "3. Histogram Hasil Dekripsi & Pemulihan", color="#059669", edge_color="#047857")
@@ -191,6 +217,7 @@ def verif(raw: bytes, fname: str, password: str, metadata: str) -> tuple:
         "ent_enc": round(shannon_entropy(prev_wm), 3),
         "ent_dec": round(shannon_entropy(prev_rec), 3),
         "ent_cipher": round(shannon_entropy_bytes(raw), 3),
+        "metrics": metrics_data,
     }
     if verdict.get("error"):
         payload["error_pesan"] = verdict["error"]
@@ -355,7 +382,9 @@ def pengujian():
     output = session.pop("uji_output", None)
     if request.method == "POST":
         skenario = request.form.get("skenario")
-        if skenario == "reversible":
+        if skenario == "lecturer_metrics":
+            target = "evaluation/measure_lecturer_metrics.py"
+        elif skenario == "reversible":
             target = "tests/test_reversible_tamper.py"
         elif skenario == "metrics":
             target = "tests/test_metrics.py"
@@ -368,14 +397,26 @@ def pengujian():
                 [sys.executable, os.path.join(BASE_DIR, target)],
                 capture_output=True,
                 text=True,
-                timeout=120,
+                timeout=180,
             )
             output = proc.stdout if proc.returncode == 0 else proc.stderr
         except subprocess.TimeoutExpired:
-            output = "Waktu pengujian habis (120 detik)."
+            output = "Waktu pengujian habis (180 detik)."
         session["uji_output"] = output
         return redirect(url_for("pengujian"))
-    return render_template("pengujian.html", output=output)
+
+    # Muat ringkasan pengukuran 10 parameter dosen (24 Slice MRI) jika tersedia
+    summary_path = os.path.join(BASE_DIR, "evaluation", "lecturer_metrics_results.json")
+    lecturer_summary = None
+    if os.path.isfile(summary_path):
+        try:
+            with open(summary_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                lecturer_summary = data.get("summary")
+        except Exception:
+            pass
+
+    return render_template("pengujian.html", output=output, lecturer_summary=lecturer_summary)
 
 
 if __name__ == "__main__":

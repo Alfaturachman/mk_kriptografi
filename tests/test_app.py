@@ -46,6 +46,11 @@ def main():
     ok.append(smk("POST protek DICOM 200", rp.status_code == 200))
     ok.append(smk("hasil protek reversible + PSNR", b"PSNR" in rp.data and b"reversible" in rp.data))
     ok.append(smk("badge reversible muncul", b"PEE-HS" in rp.data))
+    ok.append(smk("parameter MSE muncul di protek", b"MSE (Mean Squared Error)" in rp.data))
+    ok.append(smk("parameter NPCR/UACI muncul di protek", b"NPCR &amp; UACI" in rp.data))
+    ok.append(smk("parameter NC/NCC muncul di protek", b"NC &amp; NCC" in rp.data))
+    ok.append(smk("parameter Chi-Square muncul di protek", b"Chi-Square" in rp.data))
+    ok.append(smk("parameter BER muncul di protek", b"BER (Bit Error Rate)" in rp.data))
 
     urls = [r.headers.get("Location", "") for r in rp.history]
     token = None
@@ -59,6 +64,8 @@ def main():
     # bangun .krip dari protek token (file download)
     from app import materialkan
     res = materialkan(token)
+    ok.append(smk("dict metrics ada dalam token data", "metrics" in res and res["metrics"]["ber_rec_str"] == "0.00000000"))
+
     import base64
     krip_bytes = base64.b64decode(res["download_uri"].split(",")[1])
 
@@ -72,6 +79,7 @@ def main():
     ok.append(smk("POST verif DICOM 200", rv.status_code == 200))
     ok.append(smk("verif recovery lossless ditampilkan", b"lossless" in rv.data))
     ok.append(smk("verif piksel utuh pill", b"Piksel utuh" in rv.data))
+    ok.append(smk("parameter evaluasi muncul di verif", b"Evaluasi Parameter Kuantitatif" in rv.data))
 
     # verif dengan kunci salah -> error flash
     data_w = {
@@ -82,6 +90,11 @@ def main():
     }
     rw = client.post("/", data=data_w, content_type="multipart/form-data", follow_redirects=True)
     ok.append(smk("verif kunci salah -> pesan ramah", "Kunci tidak cocok" in rw.data.decode("utf-8", "replace")))
+
+    # Pengujian page table and button checks
+    r_peng = client.get("/pengujian")
+    ok.append(smk("tabel 10 parameter dosen ada di /pengujian", b"Tabel Rekapitulasi 10 Parameter Evaluasi Dosen" in r_peng.data))
+    ok.append(smk("tombol uji 10 parameter ada di /pengujian", b"lecturer_metrics" in r_peng.data))
 
     print(f"\nHasil: {sum(ok)}/{len(ok)}")
     return all(ok)
