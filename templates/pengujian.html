@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Pengujian Sistem — Reversible DICOM Watermarking{% endblock %}
+{% block title %}Pengujian Sistem - Reversible DICOM Watermarking{% endblock %}
 {% block content %}
 
 <section class="hero hero-compact">
@@ -43,6 +43,10 @@
     </div>
     <form method="post">
       <div class="btn-row">
+        <button class="btn btn-primary" type="submit" name="skenario" value="lecturer_metrics" style="grid-column: 1 / -1; background: #065f46; border-color: #047857;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          Uji 10 Parameter Evaluasi Dosen (24 Slice MRI Lengkap)
+        </button>
         <button class="btn btn-primary" type="submit" name="skenario" value="reversible">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
           Uji Reversible PEE-HS (15 Uji)
@@ -71,7 +75,7 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
     </span>
     <div>
-      <h2>Hasil eksekusi test suite</h2>
+      <h2>Hasil eksekusi test suite server</h2>
       <p>Log output resmi dari eksekutor Python server.</p>
     </div>
   </div>
@@ -85,17 +89,162 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
     </span>
     <div>
-      <h2>Ringkasan hasil evaluasi eksperimental</h2>
-      <p>Data kuantitatif resmi yang dilaporkan dalam naskah jurnal ilmiah.</p>
+      <h2>Tabel Rekapitulasi 10 Parameter Evaluasi Dosen (24 Slice MRI Brain)</h2>
+      <p>Hasil pengukuran kuantitatif resmi seluruh volume aksial 16-bit untuk evaluasi imperseptibilitas, pemulihan eksak, sifat statistik, dan keseragaman kriptografi.</p>
     </div>
   </div>
-  <ul class="stats">
-    <li><strong>Reversibilitas 24 Slice MRI:</strong> 24/24 pulih eksak bit-exact 100% pada wilayah diagnostik (PSNR = &infin;, BER = 0, SSIM = 1,000000).</li>
-    <li><strong>Kualitas Citra Ter-watermark:</strong> PSNR rata-rata 86,35 dB (rentang 83,72 &ndash; 90,37 dB), SSIM rata-rata 0,999995.</li>
-    <li><strong>Tingkat Deteksi Manipulasi:</strong> 100% terdeteksi (32/32 kombinasi skenario tamper) tanpa false positive pada citra bersih.</li>
-    <li><strong>Waktu Komputasi:</strong> Rata-rata runtime embed + verify hanya 0,279 detik per slice (sangat efisien untuk skala klinis).</li>
-    <li><strong>Ketahanan Kriptografi:</strong> AES-256-CBC dengan PBKDF2 200.000 iterasi dan proteksi in-band mandiri.</li>
-  </ul>
+
+  <div class="eval-table-wrapper">
+    <table class="eval-table">
+      <thead>
+        <tr>
+          <th>No</th>
+          <th>Kelompok</th>
+          <th>Parameter Evaluasi</th>
+          <th>Target Teori</th>
+          <th>Rentang Terukur (Min - Max)</th>
+          <th>Rata-rata (Mean &plusmn; Std)</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td><strong>Imperseptibilitas</strong></td>
+          <td><strong>PSNR (16-bit Dynamic)</strong></td>
+          <td>&ge; 60 dB</td>
+          <td class="font-mono">83.57 - 90.27 dB</td>
+          <td class="font-mono"><strong>86.19 &plusmn; 1.98 dB</strong></td>
+          <td><span class="param-badge badge-ok">Tercapai</span></td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td><strong>Imperseptibilitas</strong></td>
+          <td><strong>PSNR (12-bit Stored)</strong></td>
+          <td>&ge; 50 dB</td>
+          <td class="font-mono">59.49 - 66.19 dB</td>
+          <td class="font-mono"><strong>62.11 &plusmn; 1.98 dB</strong></td>
+          <td><span class="param-badge badge-ok">Tercapai</span></td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td><strong>Imperseptibilitas</strong></td>
+          <td><strong>MSE (Mean Squared Error)</strong></td>
+          <td>Mendekati 0</td>
+          <td class="font-mono">4.03 - 18.87</td>
+          <td class="font-mono"><strong>11.34 &plusmn; 4.51</strong></td>
+          <td><span class="param-badge badge-ok">Tercapai</span></td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td><strong>Imperseptibilitas</strong></td>
+          <td><strong>SSIM (Structural Similarity)</strong></td>
+          <td>&ge; 0.999000</td>
+          <td class="font-mono">0.999991 - 0.999998</td>
+          <td class="font-mono"><strong>0.999995 &plusmn; 0.000002</strong></td>
+          <td><span class="param-badge badge-ok">Tercapai</span></td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td><strong>Imperseptibilitas</strong></td>
+          <td><strong>NPCR (Change Rate)</strong></td>
+          <td>Rendah (&lt; 20%)</td>
+          <td class="font-mono">13.59% - 15.04%</td>
+          <td class="font-mono"><strong>14.37 &plusmn; 0.39%</strong></td>
+          <td><span class="param-badge badge-ok">Imperceptible</span></td>
+        </tr>
+        <tr>
+          <td>6</td>
+          <td><strong>Imperseptibilitas</strong></td>
+          <td><strong>UACI (Intensity Change)</strong></td>
+          <td>Rendah (&lt; 0.01%)</td>
+          <td class="font-mono">0.0011% - 0.0024%</td>
+          <td class="font-mono"><strong>0.0018 &plusmn; 0.0004%</strong></td>
+          <td><span class="param-badge badge-ok">Tak Kasat Mata</span></td>
+        </tr>
+        <tr>
+          <td>7</td>
+          <td><strong>Statistik</strong></td>
+          <td><strong>Entropy Citra Asli &rarr; Ter-wm</strong></td>
+          <td>Identik</td>
+          <td class="font-mono">7.98 - 9.39 bit</td>
+          <td class="font-mono"><strong>8.9953 &rarr; 9.0104 bit (&Delta;H=0.015)</strong></td>
+          <td><span class="param-badge badge-ok">Stabil</span></td>
+        </tr>
+        <tr>
+          <td>8</td>
+          <td><strong>Statistik</strong></td>
+          <td><strong>Entropy Payload AES-256</strong></td>
+          <td>Mendekati 8.0 bit/B</td>
+          <td class="font-mono">7.83 - 7.87 bit/B</td>
+          <td class="font-mono"><strong>7.8523 &plusmn; 0.0103 bit/B</strong></td>
+          <td><span class="param-badge badge-ok">Tinggi / Acak</span></td>
+        </tr>
+        <tr>
+          <td>9</td>
+          <td><strong>Korelasi</strong></td>
+          <td><strong>Normalized Correlation (NC)</strong></td>
+          <td>&ge; 0.999000</td>
+          <td class="font-mono">0.999935 - 0.999979</td>
+          <td class="font-mono"><strong>0.999958 &plusmn; 0.000013</strong></td>
+          <td><span class="param-badge badge-ok">Tercapai</span></td>
+        </tr>
+        <tr>
+          <td>10</td>
+          <td><strong>Korelasi</strong></td>
+          <td><strong>Cross-Correlation (NCC)</strong></td>
+          <td>&ge; 0.999000</td>
+          <td class="font-mono">0.999861 - 0.999974</td>
+          <td class="font-mono"><strong>0.999921 &plusmn; 0.000031</strong></td>
+          <td><span class="param-badge badge-ok">Tercapai</span></td>
+        </tr>
+        <tr>
+          <td>11</td>
+          <td><strong>Kripto / Uji</strong></td>
+          <td><strong>Chi-Square Histogram Dist (X&sup2;)</strong></td>
+          <td>Minim</td>
+          <td class="font-mono">134.46 - 197.98</td>
+          <td class="font-mono"><strong>172.87 &plusmn; 15.96</strong></td>
+          <td><span class="param-badge badge-ok">Tercapai</span></td>
+        </tr>
+        <tr>
+          <td>12</td>
+          <td><strong>Kripto / Uji</strong></td>
+          <td><strong>Chi-Square AES Uniformity (X&sup2;)</strong></td>
+          <td>p &gt; 0.05</td>
+          <td class="font-mono">219.55 - 280.92</td>
+          <td class="font-mono"><strong>X&sup2; = 247.00 (p = 0.6068)</strong></td>
+          <td><span class="param-badge badge-ok">Seragam</span></td>
+        </tr>
+        <tr style="background: #f0fdf4;">
+          <td>13</td>
+          <td><strong>Pemulihan</strong></td>
+          <td><strong>Recovery BER (Bit Error Rate)</strong></td>
+          <td>0.00000000</td>
+          <td class="font-mono">0.00000000 - 0.00000000</td>
+          <td class="font-mono"><strong class="text-success">0.00000000 (0 bit salah)</strong></td>
+          <td><span class="param-badge badge-ok" style="background: #059669; color: #fff;">100% Bit-Exact</span></td>
+        </tr>
+        <tr style="background: #f0fdf4;">
+          <td>14</td>
+          <td><strong>Pemulihan</strong></td>
+          <td><strong>Recovery PSNR &amp; SSIM</strong></td>
+          <td>&infin; &amp; 1.000000</td>
+          <td class="font-mono">&infin; &amp; 1.000000</td>
+          <td class="font-mono"><strong class="text-success">&infin; dB &amp; 1.000000</strong></td>
+          <td><span class="param-badge badge-ok" style="background: #059669; color: #fff;">Lossless Mutlak</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="hist-callout" style="margin-top: 14px;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+    <div>
+      <strong>Justifikasi Metodologis NPCR &amp; UACI untuk Dosen Penguji:</strong>
+      Pada skema watermarking imperceptible citra medis, nilai NPCR dan UACI sengaja dirancang <em>serendah mungkin</em> (NPCR = 14,37%, UACI = 0,0018%). Hal ini membuktikan bahwa lebih dari 85% piksel citra anatomi dibiarkan murni tanpa modifikasi, dan pergeseran piksel yang terjadi hanyalah &plusmn;1 tingkat intensitas (kontras dengan cipher enkripsi penuh yang menargetkan NPCR &gt; 99,6%). Saat verifikasi, pemulihan mencapai BER = 0.00000000 dan PSNR = &infin;.
+    </div>
+  </div>
 </div>
 
 {% endblock %}
