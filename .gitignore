@@ -13,6 +13,7 @@ htmlcov/
 # Runtime artifacts
 tmp/
 *.log
+*.krip
 
 # OS / editor
 Thumbs.db
